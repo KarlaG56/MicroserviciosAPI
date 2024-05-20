@@ -48,7 +48,7 @@ def start_consuming_queue_change_statusOrden():
         print(f"Unexpected error: {e}")
         sleep(5)
 
-def start_consumer_queue_change_statusOrden_thread():
+def start_consumer_queue_change_statusOrden_thread(  ):
     consumer_thread = Thread(target=start_consuming_queue_change_statusOrden)
     consumer_thread.daemon = True
     consumer_thread.start()
