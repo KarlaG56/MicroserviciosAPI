@@ -35,11 +35,7 @@ public class MySQLOrdersProductsRepository implements IOrdersProductsPort {
 
     @Override
     public List<OrdersProductsResponse> findProductsByOrderId(String orderId){
-        List<MySQLOrdersProductsModel> p = repository.findOrdersProductsByOrderId(orderId);
-        for (MySQLOrdersProductsModel m : p) {
-            System.out.println(m.getProduct_id());
-        }
-        List<OrdersProductsResponse> productos = p
+        List<OrdersProductsResponse> productos = repository.findOrdersProductsByOrderId(orderId)
                 .stream().map(this::from).toList();
         if(productos.isEmpty()){
             throw new NotFoundException("No products found");

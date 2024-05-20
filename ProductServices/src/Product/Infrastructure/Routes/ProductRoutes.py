@@ -35,18 +35,19 @@ def callback_queue_change_statusOrden(ch, method, properties, body):
         print(f"Error processing message: {e}")
 
 def start_consuming_queue_change_statusOrden():
-    try:
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-        channel = connection.channel()
-        channel.queue_declare(queue='queue.change.statusOrden', durable=True)
-        channel.basic_consume(queue='queue.change.statusOrden', on_message_callback=callback_queue_change_statusOrden, auto_ack=True)
-        channel.start_consuming()
-    except pika.exception.AMPQConnectionError as e:
-        print(f"AMPQ connection error: {e}, retrying in 5 seconds")
-        sleep(5)
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        sleep(5)
+    while True:
+        try:
+            connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+            channel = connection.channel()
+            channel.queue_declare(queue='queue.change.statusOrden', durable=True)
+            channel.basic_consume(queue='queue.change.statusOrden', on_message_callback=callback_queue_change_statusOrden, auto_ack=True)
+            channel.start_consuming()
+        except pika.exception.AMPQConnectionError as e:
+            print(f"AMPQ connection error: {e}, retrying in 5 seconds")
+            sleep(5)
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            sleep(5)
 
 def start_consumer_queue_change_statusOrden_thread(  ):
     consumer_thread = Thread(target=start_consuming_queue_change_statusOrden)

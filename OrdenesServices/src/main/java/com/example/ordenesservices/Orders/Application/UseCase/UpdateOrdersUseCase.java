@@ -37,7 +37,7 @@ public class UpdateOrdersUseCase {
     }
 
     private String from(OrdersProductsResponse response) {
-        return "{\n\"id\": " + response.getProductId() + ",\n\"quantity\": " + response.getQuantity() + "\n}";
+        return "{\n\"id\": \"" + response.getProductId() + "\",\n\"quantity\": " + response.getQuantity() + "\n}";
     }
 
     private void updateProducts(String request){

@@ -7,5 +7,5 @@ class UpdateCantidadByEvent:
         self.repository = repository
 
     def run(self, data):
-        self.repository.update_Quantity(data['product_id'], data['quantity'])
+        self.repository.update_Quantity(data['id'], data['quantity'])
 
