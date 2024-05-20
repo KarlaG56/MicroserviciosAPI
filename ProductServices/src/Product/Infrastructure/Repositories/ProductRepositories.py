@@ -40,3 +40,10 @@ class ProductsRepository(ProductsPort):
 
     def generate_response(self, data, message, status, httpsstatuscode):
         return BaseResponse(data, message, status, httpsstatuscode).response()
+
+    def update_Quantity(self, id, lessQuantity):
+        products = self.db.query(Model).filter(Model.id == id).first()
+        current_quantity = products.stock
+        new_quantity = current_quantity - lessQuantity
+        products.stock = new_quantity
+        self.db.commit()

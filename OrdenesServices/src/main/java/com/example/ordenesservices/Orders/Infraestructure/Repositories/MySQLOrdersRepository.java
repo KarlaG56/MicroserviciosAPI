@@ -4,6 +4,7 @@ import com.example.ordenesservices.Orders.Domain.Entities.Orders;
 import com.example.ordenesservices.Orders.Domain.Ports.IOrdersPort;
 import com.example.ordenesservices.Orders.Infraestructure.DTOS.Responses.BaseResponse;
 import com.example.ordenesservices.Orders.Infraestructure.DTOS.Responses.OrdersResponse;
+import com.example.ordenesservices.Orders.Infraestructure.Exception.NotFoundException;
 import com.example.ordenesservices.Orders.Infraestructure.Models.MySQLOrdersModel;
 import com.example.ordenesservices.Orders.Infraestructure.Repositories.JPARepositories.IOrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,14 @@ import java.util.List;
 
 @Component
 public class MySQLOrdersRepository implements IOrdersPort {
+
     @Autowired
     private IOrdersRepository repository;
 
     @Override
     public BaseResponse Listar() {
-        return from(repository.findAll().stream().map(this::from).toList(), "Orders found", true, 200);
+        return from(repository.findAll().stream().map(this::from).toList(),
+                "ordenes listadas correctamente", true, 200);
     }
 
     @Override
@@ -27,9 +30,8 @@ public class MySQLOrdersRepository implements IOrdersPort {
         MySQLOrdersModel model = new MySQLOrdersModel();
         model.setId(order.getId());
         model.setOrderDate(order.getOrderDate());
-        model.setTotal(order.getTotal());
         model.setStatus(order.getStatus());
-        System.out.println("Status" + repository.save(model));
+        model.setTotal(order.getTotal());
         return from(repository.save(model));
     }
 
@@ -40,36 +42,33 @@ public class MySQLOrdersRepository implements IOrdersPort {
         return from(from(repository.save(order)), "Orders found", true, 200);
     }
 
-    @Override
+    private BaseResponse from(OrdersResponse response, String message, boolean success, int code) {
+        return BaseResponse.builder()
+                .data(response).message(message).success(success).httpStatus(HttpStatus.valueOf(code)).build();
+    }
+
     public MySQLOrdersModel findAndEnsureExist(String id) {
-        return repository.findById(id).orElseThrow(()->new RuntimeException("Order not found"));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Not found order"));
     }
 
-    private OrdersResponse from(MySQLOrdersModel order) {
-        OrdersResponse response = new OrdersResponse();
-        response.setId(order.getId());
-        response.setStatus(order.getStatus());
-        response.setOrderDate(order.getOrderDate());
-        response.setTotal(order.getTotal());
-        return response;
+    OrdersResponse from(MySQLOrdersModel ordenModel) {
+        OrdersResponse ordenResponse = new OrdersResponse();
+        ordenResponse.setId(ordenModel.getId());
+        ordenResponse.setStatus(ordenModel.getStatus());
+        ordenResponse.setOrderDate(ordenModel.getOrderDate());
+        ordenResponse.setTotal(ordenModel.getTotal());
+        return ordenResponse;
     }
 
-    private BaseResponse from(List<OrdersResponse> responses, String message, boolean success, int code) {
-        BaseResponse response = new BaseResponse();
-        response.setData(responses);
-        response.setMessage(message);
-        response.setSuccess(success);
-        response.setHttpStatus(HttpStatus.valueOf(code));
-        return response;
+    BaseResponse from(List<OrdersResponse> responses, String message, boolean success, int code) {
+        return BaseResponse.builder()
+                .data(responses)
+                .message(message)
+                .success(success)
+                .httpStatus(HttpStatus.valueOf(code))
+                .build();
     }
 
-    private BaseResponse from(OrdersResponse data, String message, boolean success, int code) {
-        BaseResponse response = new BaseResponse();
-        response.setData(data);
-        response.setMessage(message);
-        response.setSuccess(success);
-        response.setHttpStatus(HttpStatus.valueOf(code));
-        return response;
-    }
+
 
 }

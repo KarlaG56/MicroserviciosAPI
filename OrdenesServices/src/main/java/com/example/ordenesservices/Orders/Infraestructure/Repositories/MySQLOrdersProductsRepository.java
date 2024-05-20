@@ -4,10 +4,14 @@ import com.example.ordenesservices.Orders.Domain.Entities.OrdersProducts;
 import com.example.ordenesservices.Orders.Domain.Ports.IOrdersPort;
 import com.example.ordenesservices.Orders.Domain.Ports.IOrdersProductsPort;
 import com.example.ordenesservices.Orders.Infraestructure.DTOS.Responses.OrdersProductsResponse;
+import com.example.ordenesservices.Orders.Infraestructure.Exception.NotFoundException;
+import com.example.ordenesservices.Orders.Infraestructure.Models.MySQLOrdersModel;
 import com.example.ordenesservices.Orders.Infraestructure.Models.MySQLOrdersProductsModel;
 import com.example.ordenesservices.Orders.Infraestructure.Repositories.JPARepositories.IOrdersProductsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class MySQLOrdersProductsRepository implements IOrdersProductsPort {
@@ -27,6 +31,21 @@ public class MySQLOrdersProductsRepository implements IOrdersProductsPort {
         ordersProductsModel.setQuantity(ordersProducts.getQuantity());
         ordersProductsModel.setTotal(ordersProducts.getTotal());
         return from(repository.save(ordersProductsModel));
+    }
+
+    @Override
+    public List<OrdersProductsResponse> findProductsByOrderId(String orderId){
+        List<MySQLOrdersProductsModel> p = repository.findOrdersProductsByOrderId(orderId);
+        for (MySQLOrdersProductsModel m : p) {
+            System.out.println(m.getProduct_id());
+        }
+        List<OrdersProductsResponse> productos = p
+                .stream().map(this::from).toList();
+        if(productos.isEmpty()){
+            throw new NotFoundException("No products found");
+        }
+        return productos;
+
     }
 
     private OrdersProductsResponse from(MySQLOrdersProductsModel save) {

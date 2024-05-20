@@ -21,6 +21,6 @@ public class MySQLOrdersProductsModel {
     private float total;
 
     @ManyToOne
-    @JoinColumn(name = "orden_id")
+    @JoinColumn(name = "order_id")
     private MySQLOrdersModel order;
 }

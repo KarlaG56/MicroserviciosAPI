@@ -56,7 +56,7 @@ public class CreateOrdersUseCase {
     }
 
     private BaseResponse from(CreateOrdersResponse createOrdersResponse, String message, boolean success, int status) {
-        BaseResponse baseResponse = new BaseResponse();
+        BaseResponse baseResponse = BaseResponse.builder().build();
         baseResponse.setData(createOrdersResponse.getOrder());
         baseResponse.setMessage(message);
         baseResponse.setSuccess(success);
